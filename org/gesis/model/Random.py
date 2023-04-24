@@ -29,7 +29,7 @@ def Random(N, fm, d, verbose=False, seed=None):
     '''
     np.random.seed(seed)
     start_time = time.time()
-    
+
     # 1. Init nodes
     nodes, labels, NM, Nm = _init_nodes(N,fm)
 
@@ -37,24 +37,24 @@ def Random(N, fm, d, verbose=False, seed=None):
     G = nx.DiGraph()
     G.graph = {'name':'Random', 'label':CLASS, 'groups': GROUPS}
     G.add_nodes_from([(n, {CLASS:l}) for n,l in zip(*[nodes,labels])])
-    
+
     # 3. Init edges
     E = int(round(d * N * (N-1)))
-        
+
     # INIT SUMMARY
     if verbose:
         print("Directed Graph:")
         print("N={} (M={}, m={})".format(N, NM, Nm))
         print("E={} (d={})".format(E, d))
         print('')
-        
+
     # 5. Generative process
     while G.number_of_edges() < E:
         source = _pick_source(N)
         ns = nodes[source]
         target = _pick_target(source, N, labels)
         nt = nodes[target]
-        
+
         if not G.has_edge(ns, nt):
             G.add_edge(ns, nt)
 
@@ -62,7 +62,7 @@ def Random(N, fm, d, verbose=False, seed=None):
             ls = labels[source]
             lt = labels[target]
             print("{}->{} ({}{}): {}".format(ns, nt, 'm' if ls else 'M', 'm' if lt else 'M', G.number_of_edges()))
-    
+
     duration = time.time() - start_time
     if verbose:
         print()
@@ -74,11 +74,11 @@ def Random(N, fm, d, verbose=False, seed=None):
         print(Counter([data[1][CLASS] for data in G.nodes(data=True)]))
         print()
         for k in [0,1]:
-            fit = powerlaw.Fit(data=[d for n,d in G.out_degree() if G.node[n][CLASS]==k], discrete=True)
+            fit = powerlaw.Fit(data=[d for n,d in G.out_degree() if G.nodes[n][CLASS]==k], discrete=True)
             print("{}: alpha={}, sigma={}, min={}, max={}".format('m' if k else 'M',
-                                                                  fit.power_law.alpha, 
-                                                                  fit.power_law.sigma, 
-                                                                  fit.power_law.xmin, 
+                                                                  fit.power_law.alpha,
+                                                                  fit.power_law.sigma,
+                                                                  fit.power_law.xmin,
                                                                   fit.power_law.xmax))
         print()
         print("--- %s seconds ---" % (duration))
@@ -102,7 +102,7 @@ def _pick_source(N):
     Picks 1 (index) node as source (edge from) based on activity score.
     '''
     return np.random.choice(a=np.arange(N),size=1,replace=True)[0]
-    
+
 def _pick_target(source, N, labels):
     '''
     Given a (index) source node, it returns 1 (index) target node randomly.
@@ -115,9 +115,8 @@ def _pick_target(source, N, labels):
 ################################################################
 
 if __name__ == "__main__":
-    
-    G = Random(N=1000, 
-               fm=0.5, 
+
+    G = Random(N=1000,
+               fm=0.5,
                d=0.01,
                verbose=True)
-    

@@ -45,7 +45,7 @@ def get_outdegrees_fit(path):
         degrees.extend(od)
         del(od)
     return degrees
-    
+
 def get_indegrees_fit(path):
     files = io.get_files(path, ext=EXT)
     degrees = []
@@ -70,7 +70,7 @@ def get_edge_type_counts(graph, fraction=False):
     if not fraction:
         return counts['MM'], counts['Mm'], counts['mM'], counts['mm']
 
-    total = counts['MM'] + counts['Mm'] + counts['mM'] + counts['mm'] 
+    total = counts['MM'] + counts['Mm'] + counts['mM'] + counts['mm']
     total = total if total>0 else 1
     return counts['MM']/total, counts['Mm']/total, counts['mM']/total, counts['mm']/total
 
@@ -89,18 +89,18 @@ def get_outdegree(g):
 
 def get_indegree(g):
     return [d for n,d in g.in_degree()]
-        
+
 def get_node_metadata_as_dataframe(g, njobs=1):
     cols = ['node','minority','indegree','outdegree','pagerank','wtf']
     df = pd.DataFrame(columns=cols)
     nodes = g.nodes()
-    minority = [g.node[n][g.graph['label']] for n in nodes]
+    minority = [g.nodes[n][g.graph['label']] for n in nodes]
     indegree = [g.in_degree(n) for n in nodes]
     outdegree = [g.out_degree(n) for n in nodes]
     A = nx.to_scipy_sparse_matrix(g,nodes)
     pagerank = pagerank_power(A, p=0.85, tol=1e-6)
     wtf = who_to_follow_rank(A, njobs)
-    
+
     return pd.DataFrame({'node':nodes,
                         'minority':minority,
                         'indegree':indegree,
@@ -202,7 +202,7 @@ def who_to_follow_rank(A, njobs=1):
     else:
         # TODO: implement optimal (or faster) solution for big net
         return wtf_small(A, njobs)
-        
+
 def wtf_small(A, njobs):
     utils.printf('cot_per_node...')
     cot_per_node = get_circle_of_trust_per_node(A, p=0.85, top=TOPK, num_cores=njobs)
